@@ -3,6 +3,7 @@ from utils.openapi.path_converter import FlaskPathConverter
 from utils.openapi.route_collector import RouteCollector
 from utils.openapi.schema_collector import SchemaCollector
 from utils.openapi.doc_generator import OpenAPIDocGenerator
+from app.db.database import get_db_session, create_tables
 from swagger_ui import api_doc
 app = create_app()
 
@@ -29,6 +30,7 @@ def index():
 if __name__ == "__main__":
     
     initiate_swagger_ui()
+    create_tables()
     
     print(
         f"Starting {settings.SERVICE_NAME} service (version {settings.SERVICE_VERSION}) on {settings.HOST}:{settings.PORT} with debug={settings.DEBUG}"

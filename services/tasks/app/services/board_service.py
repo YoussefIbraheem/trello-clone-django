@@ -18,13 +18,8 @@ def get_board_by_project(
     Raises:
         ValueError: If the project with the specified ID does not exist.
     """
-
-    db_project = db.query(Project).filter(Project.id == project_id).first()
-
-    if not db_project:
-        raise ValueError(f"Project with id {project_id} does not exist")
-
     with get_db_session() as db:
+         
         db_boards = (
             db.query(Board)
             .filter(Board.project_id == project_id)
