@@ -3,6 +3,7 @@ from typing import Optional
 from datetime import datetime
 
 
+
 class ProjectBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=255, description="Project Name")
     description: Optional[str] = Field(None, description="Project Description")
@@ -10,7 +11,7 @@ class ProjectBase(BaseModel):
 
 
 class ProjectCreate(ProjectBase):
-    pass 
+    pass
 
 
 class ProjectUpdate(ProjectBase):
@@ -28,3 +29,4 @@ class ProjectResponse(ProjectBase):
     updated_at: Optional[datetime] = Field(
         ..., description="Project Updating Date and Time"
     )
+
