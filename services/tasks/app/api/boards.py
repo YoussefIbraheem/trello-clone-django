@@ -9,10 +9,10 @@ from app.services.board_service import (
 )
 from flask import Blueprint, jsonify, request
 
-board_bp = Blueprint("boards", __name__, url_prefix="api/v1/boards/")
+boards_bp = Blueprint("boards", __name__, url_prefix="api/v1/boards/")
 
 
-@board_bp.route("/", methods=["GET"])
+@boards_bp.route("/", methods=["GET"])
 def boards_list():
     try:
         project_id = request.args.get("project_id")
@@ -28,7 +28,7 @@ def boards_list():
         return jsonify({"error": f"{e}"}), 500
 
 
-@board_bp.route("/<int:board_id>", methods=["GET"])
+@boards_bp.route("/<int:board_id>", methods=["GET"])
 def board_get():
     try:
         board_id = request.view_args["board_id"]
@@ -39,7 +39,7 @@ def board_get():
         return jsonify({"error": f"{e}"}), 500
 
 
-@board_bp.route("/", methods=["POST"])
+@boards_bp.route("/", methods=["POST"])
 def board_create():
     data = request.get_json()
 
@@ -54,7 +54,7 @@ def board_create():
         return jsonify({"error": f"{e}"}), 500
 
 
-@board_bp.route("/<int:board_id>", methods=["PUT"])
+@boards_bp.route("/<int:board_id>", methods=["PUT"])
 def board_update(board_id):
     data = request.get_json()
 
@@ -69,7 +69,7 @@ def board_update(board_id):
         return jsonify({"error": f"{e}"}), 500
 
 
-@board_bp.route("/<int:board_id>", methods=["DELETE"])
+@boards_bp.route("/<int:board_id>", methods=["DELETE"])
 def board_delete(board_id):
     try:
         success = delete_board(board_id=board_id)
