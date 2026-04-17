@@ -1,17 +1,17 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Enum
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
-from enum import Enum
+from enum import Enum as FlaskEnum
 from . import Base
 
 
-class TaskStatus(Enum):
+class TaskStatus(FlaskEnum):
     TODO = "todo"
     IN_PROGRESS = "in_progress"
     DONE = "done"
 
 
-class TaskPriority(Enum):
+class TaskPriority(FlaskEnum):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
