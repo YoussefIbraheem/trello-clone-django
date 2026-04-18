@@ -11,7 +11,7 @@ class Board(Base):
     id = Column(Integer,primary_key=True,index=True)
     name = Column(String,nullable=False,index=True)
     description = Column(Text,nullable=True)
-    columns = Column(JSON,nullable=True,default=["ToDO", "InProgress", "Done"])
+    columns = Column(JSON,nullable=True,default=lambda:["ToDO", "InProgress", "Done"])
     
     project_id = Column(Integer,ForeignKey("projects.id"),index=True,nullable=False)
     
