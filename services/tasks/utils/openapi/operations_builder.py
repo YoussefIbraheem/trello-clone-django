@@ -1,6 +1,6 @@
 import inspect
 
-class ParametersExtractor:
+class OperationBuilder:
 
     def extract(self, func_data):
         parameters = []
@@ -61,10 +61,13 @@ class ParametersExtractor:
                     },
                 }
                 parameters.append(new_param)
-
+                
+        tag = func_data.__module__.split(".")[-1] 
+        
         operation = {
             # endpoint name is the view function name — use it as operationId
             "operationId": pydantic_metadata.get("operation_id", ""),
+            "tags": [tag] if tag else [],
             "parameters": parameters,
             "responses": {"200": {"description": "Successful Response"}},
         }

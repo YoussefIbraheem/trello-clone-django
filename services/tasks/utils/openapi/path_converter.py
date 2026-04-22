@@ -37,4 +37,4 @@ class FlaskPathConverter:
         
         
         openapi_path = pattern.sub(replace_param, flask_path)
-        return openapi_path, parameters
+        return openapi_path

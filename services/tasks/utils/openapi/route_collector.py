@@ -1,7 +1,7 @@
 from pydantic.json_schema import models_json_schema
 from flask import Flask
 from .path_converter import FlaskPathConverter
-from .parameters_extractor import ParametersExtractor
+from .operations_builder import OperationBuilder
 import importlib
 
 
@@ -12,11 +12,11 @@ class RouteCollector:
         app: Flask,
         converter: FlaskPathConverter,
 
-        parameters_extractor: ParametersExtractor,
+        operations_builder: OperationBuilder,
     ):
         self.app = app
         self.converter = converter
-        self.parameters_extractor = parameters_extractor
+        self.operations_builder = operations_builder
 
     IGNORED_METHODS = {"HEAD", "OPTIONS"}
 
@@ -44,7 +44,7 @@ class RouteCollector:
                 if rule.endpoint == "static":
                     continue
 
-                openapi_path, _ = self.converter.convert(rule.rule)
+                openapi_path = self.converter.convert(rule.rule)
 
                 if openapi_path not in paths:
                     paths[openapi_path] = {}
