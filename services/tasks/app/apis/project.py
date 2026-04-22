@@ -8,12 +8,37 @@ from app.services.project_service import (
 from app.schemas.project_schema import (
     ProjectCreate,
     ProjectUpdate,
+    ProjectResponse,
 )
 from flask import Blueprint, request, jsonify
+from utils.openapi.decorators import document
 
 project_bp = Blueprint("project", __name__, url_prefix="/api/v1/projects")
 
 
+@document(
+    query_params=[
+        {
+            "name": "owner_id",
+            "type": "string",
+            "required": True,
+            "description": "The ID of the owner for which to retrieve projects",
+        },
+        {
+            "name": "limit",
+            "type": "integer",
+            "required": False,
+            "description": "The maximum number of projects to retrieve",
+        },
+        {
+            "name": "offset",
+            "type": "integer",
+            "required": False,
+            "description": "The offset for pagination",
+        },
+    ],
+    response_schema=ProjectResponse,
+)
 @project_bp.route("/", methods=["GET"])
 def projects_list():
     """
@@ -33,6 +58,7 @@ def projects_list():
         return jsonify({"error": f"{e}"}), 500
 
 
+@document(response_schema=ProjectResponse)
 @project_bp.route("/<int:project_id>", methods=["GET"])
 def project_details(project_id: int):
     """
@@ -45,6 +71,10 @@ def project_details(project_id: int):
         return jsonify({"error": f"Failed to retrieve project: {e}"}), 500
 
 
+@document(
+    request_schema=ProjectCreate,
+    response_schema=ProjectResponse,
+)
 @project_bp.route("/", methods=["POST"])
 def project_create():
     """
@@ -63,8 +93,12 @@ def project_create():
         return jsonify({"error": f"Failed to create project:{str(e)}"})
 
 
+@document(
+    request_schema=ProjectUpdate,
+    response_schema=ProjectResponse,
+)
 @project_bp.route("/<int:project_id>", methods=["PUT"])
-def project_update(project_id):
+def project_update(project_id: int):
     """
     Update an existing project with new data.
     """
@@ -86,9 +120,9 @@ def project_update(project_id):
 
 
 @project_bp.route("/<int:project_id>", methods=["DELETE"])
-def project_delete(project_id):
+def project_delete(project_id: int):
     """
-        Delete a project by ID.
+    Delete a project by ID.
     """
     try:
         delete_project(project_id=project_id)

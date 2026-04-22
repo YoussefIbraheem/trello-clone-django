@@ -7,10 +7,34 @@ from app.services.board_service import (
     delete_board,
 )
 from flask import Blueprint, jsonify, request
+from utils.openapi.decorators import document
 
 board_bp = Blueprint("board", __name__, url_prefix="/api/v1/boards/")
 
 
+@document(
+    query_params=[
+        {
+            "name": "project_id",
+            "type": "string",
+            "required": True,
+            "description": "The ID of the project for which to retrieve boards",
+        },
+        {
+            "name": "limit",
+            "type": "integer",
+            "required": False,
+            "description": "The maximum number of boards to retrieve",
+        },
+        {
+            "name": "offset",
+            "type": "integer",
+            "required": False,
+            "description": "The offset for pagination",
+        },
+    ],
+    response_schema=BoardResponse,
+)
 @board_bp.route("/", methods=["GET"])
 def boards_list():
     """
@@ -31,8 +55,9 @@ def boards_list():
         return jsonify({"error": f"{e}"}), 500
 
 
+@document(response_schema=BoardResponse)
 @board_bp.route("/<int:board_id>", methods=["GET"])
-def board_get():
+def board_get(board_id: int):
     """
     Retrieve a specific board by its ID.
     """
@@ -46,6 +71,10 @@ def board_get():
         return jsonify({"error": f"{e}"}), 500
 
 
+@document(
+    request_schema=BoardCreate,
+    response_schema=BoardResponse,
+)
 @board_bp.route("/", methods=["POST"])
 def board_create():
     """
@@ -65,8 +94,12 @@ def board_create():
         return jsonify({"error": f"{e}"}), 500
 
 
+@document(
+    request_schema=BoardUpdate,
+    response_schema=BoardResponse,
+)
 @board_bp.route("/<int:board_id>", methods=["PUT"])
-def board_update(board_id):
+def board_update(board_id: int):
     """
     Update a specific board by its ID.
     """
@@ -84,7 +117,7 @@ def board_update(board_id):
 
 
 @board_bp.route("/<int:board_id>", methods=["DELETE"])
-def board_delete(board_id):
+def board_delete(board_id: int):
     """
     Delete a specific board by its ID.
     """
