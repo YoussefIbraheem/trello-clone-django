@@ -10,6 +10,8 @@ class ProjectBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=255, description="Project Name")
     description: Optional[str] = Field(None, description="Project Description")
     owner_id: int = Field(..., description="Owner ID")
+    
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ProjectCreate(ProjectBase):
@@ -29,7 +31,6 @@ class ProjectUpdate(ProjectBase):
     )
     description: Optional[str] = Field(None, description="Project Description")
 
-    model_config = ConfigDict(from_attributes=True)
 
 
 class ProjectResponse(ProjectBase):

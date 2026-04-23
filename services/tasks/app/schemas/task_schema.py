@@ -16,6 +16,8 @@ class TaskBase(BaseModel):
     assigned_to: str = Field(..., description="ID of the task assingee")
     board_id: int = Field(..., description="ID of the parent board")
     due_date: Optional[datetime] = Field(None, description="Due date of the task")
+    
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TaskResponse(TaskBase):
@@ -23,7 +25,6 @@ class TaskResponse(TaskBase):
     created_at: datetime = Field(..., description="Task creation timestamp")
     updated_at: Optional[datetime] = Field(None, description="Task update timestamp")
 
-    model_config = ConfigDict(from_attributes=True)
 
 
 class TaskCreate(TaskBase):
