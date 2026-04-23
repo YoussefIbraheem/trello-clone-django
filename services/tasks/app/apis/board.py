@@ -126,7 +126,7 @@ def board_delete(board_id: int):
         success = delete_board(board_id=board_id)
 
         if not success:
-            return jsonify({"error": "Board Not Found"}), 404
+            return jsonify({"error": "tests/board_test.py::test_board_update_returns_updated_boardd"}), 404
 
         return jsonify({"message": "Board Deleted Successfully"}), 200
     except Exception as e:

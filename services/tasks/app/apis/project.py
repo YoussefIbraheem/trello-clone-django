@@ -126,6 +126,6 @@ def project_delete(project_id: int):
     """
     try:
         delete_project(project_id=project_id)
-        return jsonify({"Project Deleted Successfully!"}), 200
+        return jsonify({"message": "Project Deleted Successfully!"}), 200
     except Exception as e:
         return jsonify({"error": f"Failed to delete project: {str(e)}"}), 404

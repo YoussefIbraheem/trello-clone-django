@@ -72,10 +72,10 @@ def tasks_list():
         status = request.args.get("status")
         priority = request.args.get("priority")
         limit = request.args.get("limit")
-        offest = request.args.get("offest")
+        offset = request.args.get("offset")
 
         tasks = get_tasks(
-            board_id, user_id, assigned_to, status, priority, limit, offest
+            board_id, user_id, assigned_to, status, priority, limit, offset
         )
 
         data = [task.model_dump() for task in tasks]
@@ -95,7 +95,7 @@ def task_get(task_id: int):
     """
 
     try:
-        task_id = request.view_args(["task_id"])
+        task_id = request.view_args["task_id"]
         task = get_task_by_id(task_id=task_id)
         return jsonify(task.model_dump()), 200
 

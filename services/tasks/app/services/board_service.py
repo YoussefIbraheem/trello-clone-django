@@ -8,7 +8,8 @@ from app.db.database import get_db_session
 def get_board_by_project(
     project_id: int, limit: int = 50, offset: int = 0
 ) -> List[BoardResponse]:
-    """Retrieve a paginated list of boards associated with a specific project.
+    """
+    Retrieve a paginated list of boards associated with a specific project.
     Args:
         project_id (int): The ID of the project to retrieve boards for.
         limit (int, optional): The maximum number of boards to return. Defaults to 50.
@@ -19,7 +20,7 @@ def get_board_by_project(
         ValueError: If the project with the specified ID does not exist.
     """
     with get_db_session() as db:
-         
+
         db_boards = (
             db.query(Board)
             .filter(Board.project_id == project_id)
@@ -28,11 +29,12 @@ def get_board_by_project(
             .all()
         )
 
-        return [BoardResponse.model_dump(board) for board in db_boards]
+        return [BoardResponse.model_validate(board) for board in db_boards]
 
 
 def get_board_by_id(board_id: int) -> Optional[BoardResponse]:
-    """Get Board Details
+    """
+    Get Board Details
 
     Args:
         board_id (int): The ID of the board to retrieve
@@ -54,7 +56,8 @@ def get_board_by_id(board_id: int) -> Optional[BoardResponse]:
 
 
 def create_board(board_data: BoardCreate) -> BoardResponse:
-    """Create Board
+    """
+    Create Board
 
     Args:
         board_data (BoardCreate): The data for the board to be created
@@ -79,8 +82,8 @@ def create_board(board_data: BoardCreate) -> BoardResponse:
 
 
 def update_board(board_id: int, board_data: BoardUpdate) -> Optional[BoardResponse]:
-    """Update an existing board.
-
+    """
+    Update an existing board.
     Args:
         board_id (int): The ID of the board to update
         board_data (BoardUpdate): The updated board data
@@ -112,7 +115,8 @@ def update_board(board_id: int, board_data: BoardUpdate) -> Optional[BoardRespon
 
 
 def delete_board(board_id: int) -> bool:
-    """Delete Board
+    """
+    Delete Board
 
     Args:
         board_id (int): The ID of the board to delete
@@ -128,7 +132,7 @@ def delete_board(board_id: int) -> bool:
         db_board = db.query(Board).filter(Board.id == board_id).first()
 
         if not db_board:
-            raise ValueError(f"Board with id {board_id} does not exist")
+            return False
 
         db.delete(db_board)
         db.flush()

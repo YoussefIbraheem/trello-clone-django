@@ -24,6 +24,8 @@ def get_projects_by_owner(
             .limit(limit)
             .all()
         )
+        
+        print(db_projects)
 
         return [ProjectResponse.model_validate(project) for project in db_projects]
 
