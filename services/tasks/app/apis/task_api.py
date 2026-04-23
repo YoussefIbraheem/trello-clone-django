@@ -140,7 +140,6 @@ def task_update(task_id):
         return jsonify({"error": "No Data Provided"}), 400
 
     try:
-
         task_data = TaskUpdate(**data)
         updated_task = update_task(task_id=task_id, task_data=task_data)
         return jsonify(updated_task.model_dump())
