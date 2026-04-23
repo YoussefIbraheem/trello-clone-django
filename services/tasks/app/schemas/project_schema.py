@@ -20,7 +20,7 @@ class ProjectCreate(ProjectBase):
     pass
 
 
-class ProjectUpdate(ProjectBase):
+class ProjectUpdate(BaseModel):
     """Model for updating an existing project.
 
     Only provides optional fields so partial updates are allowed.
@@ -30,6 +30,8 @@ class ProjectUpdate(ProjectBase):
         None, min_length=1, max_length=255, description="Project Name"
     )
     description: Optional[str] = Field(None, description="Project Description")
+    
+    model_config = ConfigDict(from_attributes=True)
 
 
 

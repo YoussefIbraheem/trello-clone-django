@@ -17,7 +17,7 @@ class TaskBase(BaseModel):
     board_id: int = Field(..., description="ID of the parent board")
     due_date: Optional[datetime] = Field(None, description="Due date of the task")
     
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True,use_enum_values=True)
 
 
 class TaskResponse(TaskBase):
@@ -42,6 +42,8 @@ class TaskUpdate(BaseModel):
     assigned_to: Optional[str] = Field(None, description="ID of the task assingee")
     board_id: Optional[int] = Field(None, description="ID of the parent board")
     due_date: Optional[datetime] = Field(None, description="Due date of the task")
+    
+    model_config = ConfigDict(from_attributes=True,use_enum_values=True)
 
 
 class TaskStats(BaseModel):
