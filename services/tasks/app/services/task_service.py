@@ -5,6 +5,7 @@ from app.schemas.task_schema import TaskCreate, TaskUpdate, TaskResponse
 from app.db.database import get_db_session
 from sqlalchemy import func
 
+
 def get_tasks(
     board_id: int,
     user_id: Optional[str] = None,
@@ -80,17 +81,14 @@ def create_task(task_data: TaskCreate) -> TaskResponse:
 
 def update_task(task_id: int, task_data: TaskUpdate) -> Optional[TaskResponse]:
     with get_db_session() as db:
-        db_task: Task = db.query(Task).filter(Task.id == task_id).first()
+        db_task = db.query(Task).filter(Task.id == task_id).first()
 
         if not db_task:
             raise ValueError(f"Task with ID {task_id} not found!")
 
         for field, value in task_data.model_dump(exclude_unset=True).items():
             setattr(db_task, field, value)
-        
-        
-        
-        
+
         db_task.updated_at = func.now()
         db.flush()
         db.refresh(db_task)
@@ -113,19 +111,18 @@ def delete_task(task_id: int) -> bool:
 def get_task_stats() -> dict:
     with get_db_session() as db:
         db_rows = db.query(Task.status, Task.priority, Task.user_id).all()
-        
-        tasks_by_status = {s.value:0 for s in TaskStatus}
-        tasks_by_priority = {p.value:0 for p in TaskPriority}
+
+        tasks_by_status = {s.value: 0 for s in TaskStatus}
+        tasks_by_priority = {p.value: 0 for p in TaskPriority}
         tasks_by_user = {}
-        for status , priority, user_id in db_rows:
-            tasks_by_status[status.value] +=1
-            tasks_by_priority[priority.value] +=1
-            tasks_by_user[user_id] = tasks_by_user.get(user_id,0) + 1
-            
-        
+        for status, priority, user_id in db_rows:
+            tasks_by_status[status.value] += 1
+            tasks_by_priority[priority.value] += 1
+            tasks_by_user[user_id] = tasks_by_user.get(user_id, 0) + 1
+
         return {
             "total_tasks": len(db_rows),
             "tasks_by_status": tasks_by_status,
             "tasks_by_priority": tasks_by_priority,
-            "tasks_by_user":tasks_by_user
+            "tasks_by_user": tasks_by_user,
         }
