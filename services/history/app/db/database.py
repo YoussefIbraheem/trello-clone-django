@@ -13,9 +13,6 @@ _client: AsyncMongoClient | None = None
 async def connect_db():
     global _client
     
-    if _client is not None:
-        return
-    
     logger.info("DB_URL used: '%s'.",settings.MONGO_DB_URL)
     _client = AsyncMongoClient(settings.MONGO_DB_URL)
 
