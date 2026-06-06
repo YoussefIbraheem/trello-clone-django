@@ -111,6 +111,7 @@ services:
       - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+      - ./rabbitmq-definitions.json:/etc/rabbitmq/definitions.json:ro
 
   celery_users_worker:
     container_name: celery_users_worker
@@ -141,7 +142,7 @@ services:
     build:
       context: ./services/history
       dockerfile: Dockerfile
-    command: celery -A app.tasks.event_task worker --loglevel=info --queues=history
+    command: celery -A app.consumers.history_consumer worker --loglevel=info --queues=history
     volumes:
       - ./services/history:/app
     working_dir: /app

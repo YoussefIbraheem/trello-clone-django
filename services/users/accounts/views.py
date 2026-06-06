@@ -34,7 +34,7 @@ class UserRegisterationView(views.APIView):
 
             user = serializer.save()
 
-            publish_history_event(
+            publish_history_event.delay(
                 {
                     "service": "users",
                     "action": "user_register",

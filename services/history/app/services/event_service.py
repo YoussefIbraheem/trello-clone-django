@@ -1,8 +1,8 @@
 from app.models.event import Event
+from app.db.database import connect_db
 from app.schemas.event_schema import EventCreate, EventsStats, EventResponse
 from typing import Optional
 from datetime import datetime, timezone
-from app.db.database import connect_to_mongo
 
 async def get_events(
     service: Optional[str] = None,
@@ -35,9 +35,8 @@ async def get_event_by_id(event_id: str):
 
 
 async def create_event(event_data: dict):
-    
-    event_create = EventCreate(**event_data)
 
+    event_create = EventCreate(**event_data)
     event = Event(
         service=event_create.service,
         action=event_create.action,
@@ -47,5 +46,4 @@ async def create_event(event_data: dict):
     )
 
     await event.insert()
-
     return str(event.id)

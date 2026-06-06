@@ -206,6 +206,6 @@ SIMPLE_JWT = {
 CELERY_BROKER_URL = env("CELERY_BROKER_URL")
 CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND")
 CELERY_IGNORE_RESULT = True
-CELERY_TASK_ROUTES = {
-    "app.tasks.event_task.process_event_background": {"queue": "history"}
-}
+# CELERY_TASK_ROUTES = {
+#     "app.consumers.history_consumer.record_activity": {"queue": "history"}
+# }
