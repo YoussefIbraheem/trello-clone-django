@@ -11,9 +11,9 @@ from .serializers import (
     UserPasswordChangeSerializer,
     UserLogoutSerializer,
 )
+from .events import UserRegisteredEvent
 from .models import UserProfile, User, UserVerification
-from .tasks import publish_history_event
-from utils.generate_unique_number import generate_verification_code
+from .publisher import publish_history_event
 import logging
 
 logger = logging.getLogger(__name__)
@@ -33,15 +33,14 @@ class UserRegisterationView(views.APIView):
         if serializer.is_valid():
 
             user = serializer.save()
+            
+            print(f"USERID TYPE: {type(user.id)}")
 
-            publish_history_event.delay(
-                {
-                    "service": "users",
-                    "action": "user_register",
-                    "user_id": str(user.id),
-                    "details": {"email": user.email, "username": user.username},
-                }
+            event = UserRegisteredEvent(
+                user_id=str(user.id), email=user.email, username=user.username
             )
+
+            publish_history_event.delay(event.to_dict())
 
             refresh = tokens.RefreshToken.for_user(user=user)
 
