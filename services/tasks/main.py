@@ -6,9 +6,9 @@ from utils.openapi.doc_generator import OpenAPIDocGenerator
 from utils.openapi.operations_builder import OperationBuilder
 from app.db.database import get_db_session, create_tables
 from swagger_ui import api_doc
+from flask.logging import create_logger
 
 app = create_app()
-
 
 def initiate_swagger_ui():
     converter = FlaskPathConverter()

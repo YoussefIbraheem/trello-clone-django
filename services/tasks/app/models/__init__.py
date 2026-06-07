@@ -1,7 +1,20 @@
+from datetime import datetime
+
 from sqlalchemy.orm import DeclarativeBase
 
+
 class Base(DeclarativeBase):
-    pass
+    def to_dict(self):
+        """Convert object to dictionary."""
+        # check if the value is datetime and make it iso to be serializable
+        data = {}
+        for col in self.__table__.columns:
+            attr = getattr(self, col.name)
+            if isinstance(attr, datetime):
+                setattr(self, col.name, attr.isoformat())
+            data[col.name] = attr
+        return data
+
 
 from .board import Board
 from .project import Project

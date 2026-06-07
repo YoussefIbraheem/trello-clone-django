@@ -2,7 +2,10 @@ from typing import List, Optional
 from app.models.project import Project
 from app.schemas.project_schema import ProjectCreate, ProjectUpdate, ProjectResponse
 from app.db.database import get_db_session
+from utils.publisher import publish_history_event
+import logging
 
+logger = logging.getLogger(__name__)
 
 def get_projects_by_owner(
     owner_id: str, limit: int = 50, offset: int = 0
@@ -61,6 +64,11 @@ def create_project(project_data: ProjectCreate) -> ProjectResponse:
         db.add(db_project)
         db.flush()
         db.refresh(db_project)
+
+        logger.info(db_project.to_dict())
+
+        publish_history_event(db_project.to_dict())
+
 
         return ProjectResponse.model_validate(db_project)
 

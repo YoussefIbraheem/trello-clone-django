@@ -25,6 +25,9 @@ class Settings:
     # Database settings
     DB_URL: str = "postgresql://postgres:password@localhost:5432/trello_tasks_db"
 
+    # Broker URL
+    BROKER_URL = "amqp://guest:guest@rabbitmq:5672//"
+
     _instance: Optional[Settings] = None
 
     def __post_init__(self):
@@ -36,6 +39,7 @@ class Settings:
         self.PORT = os.getenv("PORT", self.PORT)
         self.DEBUG = os.getenv("DEBUG", str(self.DEBUG)).lower() == "true"
         self.DB_URL = os.getenv("DB_URL", self.DB_URL)
+        self.BROKER_URL = os.getenv("BROKER_URL",self.BROKER_URL)
 
     @classmethod
     def get_instance(cls) -> Settings:
