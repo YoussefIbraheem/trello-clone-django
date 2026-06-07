@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
-
+from dirtyfields import DirtyFieldsMixin
 
 class User(AbstractUser):
     
@@ -24,7 +24,7 @@ class User(AbstractUser):
         return full_name if full_name.strip() else self.email
 
 
-class UserProfile(models.Model):
+class UserProfile(models.Model,DirtyFieldsMixin):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     bio = models.TextField(blank=True, max_length=100)
 

@@ -41,12 +41,6 @@ class UserRegisterationView(views.APIView):
 
             print(f"USERID TYPE: {type(user.id)}")
 
-            event = UserRegisteredEvent(
-                user_id=str(user.id), email=user.email, username=user.username
-            )
-
-            publish_history_event.delay(event.to_dict())
-
             refresh = tokens.RefreshToken.for_user(user=user)
 
             return response.Response(
@@ -123,16 +117,10 @@ class UserProfileView(views.APIView):
             profile = request.user.profile
         except UserProfile.DoesNotExist:
             profile = UserProfile.objects.create(user=request.user)
-
         serializer = UserProfileSerializer(profile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            event = UserUpdateEvent(
-                user_id=str(request.user.id),
-                email=request.user.email,
-                updated_fields=list(serializer.validated_data.keys()),
-            )
-            publish_history_event.delay(event.to_dict())
+
             return response.Response(serializer.data)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

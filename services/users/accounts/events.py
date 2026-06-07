@@ -47,7 +47,7 @@ class UserLogoutEvent(BaseEvent):
         )
 
 class UserUpdateEvent(BaseEvent):
-    def __init__(self, user_id: str, email: str, updated_fields: list, actor_id: Optional[str] = None):
+    def __init__(self, user_id: str, email: str, updated_fields: Optional[list], actor_id: Optional[str] = None):
         super().__init__(
             user_id=user_id,
             actor_id=actor_id,
