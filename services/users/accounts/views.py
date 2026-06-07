@@ -1,20 +1,27 @@
+import logging
+
 from django.shortcuts import render
-from rest_framework import views, permissions, response, status, generics
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework import generics, permissions, response, status, views
 from rest_framework_simplejwt import tokens
+
+from .events import (
+    UserLoginEvent,
+    UserLogoutEvent,
+    UserRegisteredEvent,
+    UserUpdateEvent,
+)
+from .models import User, UserProfile
+from .publisher import publish_history_event
 from .serializers import (
+    UserLoginSerializer,
+    UserLogoutSerializer,
+    UserPasswordChangeSerializer,
+    UserProfileSerializer,
     UserRegisterationSerializer,
     UserSerializer,
-    UserLoginSerializer,
-    UserProfileSerializer,
-    UserPasswordChangeSerializer,
-    UserLogoutSerializer,
 )
-from .events import UserRegisteredEvent
-from .models import UserProfile, User, UserVerification
-from .publisher import publish_history_event
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +30,6 @@ logger = logging.getLogger(__name__)
 
 
 class UserRegisterationView(views.APIView):
-
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
 
@@ -31,9 +37,8 @@ class UserRegisterationView(views.APIView):
     def post(self, request):
         serializer = UserRegisterationSerializer(data=request.data)
         if serializer.is_valid():
-
             user = serializer.save()
-            
+
             print(f"USERID TYPE: {type(user.id)}")
 
             event = UserRegisteredEvent(
@@ -59,7 +64,6 @@ class UserRegisterationView(views.APIView):
 
 
 class UserLoginView(views.APIView):
-
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
 
@@ -70,6 +74,10 @@ class UserLoginView(views.APIView):
             user = serializer.validated_data
 
             refresh = tokens.RefreshToken.for_user(user=user)
+
+            event = UserLoginEvent(user_id=str(user.id), email=user.email)
+
+            publish_history_event.delay(event.to_dict())
 
             logger.warning(
                 f"REFRESH TOKEN FOR USER {user.username}: {str(refresh)}", exc_info=True
@@ -93,13 +101,11 @@ class UserLoginView(views.APIView):
 
 
 class UserProfileView(views.APIView):
-
     permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(responses={200: UserProfileSerializer()})
     def get(self, request):
         try:
-
             profile = request.user.profile
             serializer = UserProfileSerializer(profile).data
             return response.Response(serializer)
@@ -121,12 +127,17 @@ class UserProfileView(views.APIView):
         serializer = UserProfileSerializer(profile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            event = UserUpdateEvent(
+                user_id=str(request.user.id),
+                email=request.user.email,
+                updated_fields=list(serializer.validated_data.keys()),
+            )
+            publish_history_event.delay(event.to_dict())
             return response.Response(serializer.data)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserChangePasswordView(views.APIView):
-
     permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(
@@ -140,8 +151,15 @@ class UserChangePasswordView(views.APIView):
             data=request.data, context={"request": request}
         )
         if serializer.is_valid():
-
             serializer.save()
+
+            event = UserUpdateEvent(
+                user_id=str(request.user.id),
+                email=request.user.email,
+                updated_fields=["password"],
+            )
+
+            publish_history_event.delay(event.to_dict())
 
             return response.Response(
                 {"message": "Password Updated Successfully!"},
@@ -151,7 +169,6 @@ class UserChangePasswordView(views.APIView):
 
 
 class UserLogoutView(views.APIView):
-
     permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(
@@ -164,6 +181,10 @@ class UserLogoutView(views.APIView):
         )
         if serializer.is_valid():
             serializer.save()
+            event = UserLogoutEvent(
+                user_id=str(request.user.id), email=request.user.email
+            )
+            publish_history_event.delay(event.to_dict())
             return response.Response(
                 {"message": "User logged out successfully."},
                 status=status.HTTP_200_OK,
@@ -172,7 +193,6 @@ class UserLogoutView(views.APIView):
 
 
 class UserListView(generics.ListAPIView):
-
     queryset = User.objects.all()
     permission_classes = [permissions.IsAdminUser]
     serializer_class = UserSerializer
@@ -185,7 +205,6 @@ class UserListView(generics.ListAPIView):
 
 
 class UserDetailsView(generics.RetrieveAPIView):
-
     queryset = User.objects.all()
     permission_classes = [permissions.IsAdminUser]
     serializer_class = UserSerializer
@@ -196,7 +215,6 @@ class UserDetailsView(generics.RetrieveAPIView):
 
 
 class UserVerificationEmailView(views.APIView):
-
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
 
