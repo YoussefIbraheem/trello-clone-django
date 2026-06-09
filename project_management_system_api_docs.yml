@@ -1,0 +1,265 @@
+opencollection: 1.0.0
+info:
+  name: project_management_system_api_docs
+config:
+  environments:
+    - name: localhost5005
+      variables:
+        - name: baseUrl
+          value: http://localhost:5005/api
+    - name: localhost8000
+      variables:
+        - name: baseUrl
+          value: http://localhost:8000/api
+        - name: refreshToken
+          secret: true
+        - name: accessToken
+          secret: true
+items:
+  - info:
+      name: task_service
+      type: folder
+    items:
+      - info:
+          name: board
+          type: folder
+      - info:
+          name: project
+          type: folder
+      - info:
+          name: task
+          type: folder
+  - info:
+      name: User
+      type: folder
+      seq: 1
+    request:
+      headers:
+        - name: Accept
+          value: application/json
+      auth: inherit
+      variables:
+        - name: url
+          value: '{{baseUrl}}/v1/auth'
+    items:
+      - info:
+          name: change_password
+          type: http
+          seq: 4
+        http:
+          method: POST
+          url: '{{url}}/change-password/'
+          headers:
+            - name: Accept
+              value: application/json
+          body:
+            type: multipart-form
+            data:
+              - name: current_password
+                type: text
+                value: password@123
+              - name: new_password
+                type: text
+                value: password@456
+              - name: confirm_new_password
+                type: text
+                value: password@456
+          auth: inherit
+        settings:
+          encodeUrl: true
+          timeout: 0
+          followRedirects: true
+          maxRedirects: 5
+      - info:
+          name: list-users
+          type: http
+          seq: 6
+        http:
+          method: GET
+          url: '{{url}}/users/'
+          body:
+            type: multipart-form
+            data:
+              - name: email
+                type: text
+                value: ''
+              - name: username
+                type: text
+                value: ''
+              - name: is_verified
+                type: file
+                value:
+                  - ''
+          auth: inherit
+        settings:
+          encodeUrl: true
+          timeout: 0
+          followRedirects: true
+          maxRedirects: 5
+      - info:
+          name: login
+          type: http
+          seq: 2
+        http:
+          method: POST
+          url: '{{url}}/login/'
+          headers:
+            - name: Accept
+              value: application/json
+          body:
+            type: multipart-form
+            data:
+              - name: email
+                type: text
+                value: test11@test.com
+              - name: password
+                type: text
+                value: password@123
+          auth: inherit
+        runtime:
+          scripts:
+            - type: after-response
+              code: |-
+                let accessToken = res.body["tokens"]["access"]
+                let refreshToken = res.body["tokens"]["refresh"]
+                bru.setEnvVar("accessToken", accessToken)
+                bru.setEnvVar("refreshToken", refreshToken)
+        settings:
+          encodeUrl: true
+          timeout: 0
+          followRedirects: true
+          maxRedirects: 5
+      - info:
+          name: logout
+          type: http
+          seq: 5
+        http:
+          method: POST
+          url: '{{url}}/logout/'
+          headers:
+            - name: Accept
+              value: application/json
+          body:
+            type: multipart-form
+            data:
+              - name: refresh_token
+                type: text
+                value: '{{refreshToken}}'
+          auth: inherit
+        settings:
+          encodeUrl: true
+          timeout: 0
+          followRedirects: true
+          maxRedirects: 5
+      - info:
+          name: profile-update
+          type: http
+          seq: 9
+        http:
+          method: PUT
+          url: '{{url}}/profile/'
+          auth: inherit
+        settings:
+          encodeUrl: true
+          timeout: 0
+          followRedirects: true
+          maxRedirects: 5
+      - info:
+          name: profile
+          type: http
+          seq: 3
+        http:
+          method: GET
+          url: '{{url}}/profile/'
+          auth: inherit
+        settings:
+          encodeUrl: true
+          timeout: 0
+          followRedirects: true
+          maxRedirects: 5
+      - info:
+          name: register
+          type: http
+          seq: 1
+        http:
+          method: POST
+          url: '{{url}}/register/'
+          headers:
+            - name: Accept
+              value: application/json
+          body:
+            type: form-urlencoded
+            data:
+              - name: username
+                value: testuser11
+              - name: email
+                value: test11@test.com
+              - name: password
+                value: password@123
+              - name: password_confirm
+                value: password@123
+          auth: inherit
+        runtime:
+          scripts:
+            - type: after-response
+              code: |-
+                let accessToken = res.body["tokens"]["access"]
+                let refreshToken = res.body["tokens"]["refresh"]
+                bru.setEnvVar("accessToken", accessToken)
+                bru.setEnvVar("refreshToken", refreshToken)
+        settings:
+          encodeUrl: true
+          timeout: 0
+          followRedirects: true
+          maxRedirects: 5
+      - info:
+          name: user-details
+          type: http
+          seq: 7
+        http:
+          method: GET
+          url: '{{url}}/users/:pk/'
+          params:
+            - name: pk
+              value: ''
+              type: path
+          auth: inherit
+        settings:
+          encodeUrl: true
+          timeout: 0
+          followRedirects: true
+          maxRedirects: 5
+      - info:
+          name: verify-user
+          type: http
+          seq: 8
+        http:
+          method: POST
+          url: '{{url}}/verify-user/'
+          body:
+            type: multipart-form
+            data:
+              - name: email
+                type: text
+                value: test9@test.com
+              - name: code
+                type: text
+                value: '589866'
+          auth: inherit
+        settings:
+          encodeUrl: true
+          timeout: 0
+          followRedirects: true
+          maxRedirects: 5
+request:
+  auth:
+    type: bearer
+    token: '{{accessToken}}'
+bundled: true
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git
+    exportedAt: '2026-06-09T13:43:17.466Z'
+    exportedUsing: Bruno
