@@ -1,8 +1,0 @@
-name: localhost8000
-variables:
-  - name: baseUrl
-    value: http://localhost:8000/api
-  - secret: true
-    name: refreshToken
-  - secret: true
-    name: accessToken
