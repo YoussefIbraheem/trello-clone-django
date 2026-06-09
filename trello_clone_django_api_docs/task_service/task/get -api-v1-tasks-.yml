@@ -1,0 +1,102 @@
+info:
+  name: get /api/v1/tasks/
+  type: http
+  seq: 1
+  tags:
+    - task
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/v1/tasks/"
+  params:
+    - name: board_id
+      value: ""
+      type: query
+      description: The ID of the board for which to retrieve tasks
+      disabled: true
+    - name: user_id
+      value: ""
+      type: query
+      description: The ID of the user for which to retrieve tasks
+      disabled: true
+    - name: assigned_to
+      value: ""
+      type: query
+      description: The ID of the assignee for which to retrieve tasks
+      disabled: true
+    - name: status
+      value: ""
+      type: query
+      description: The status of the tasks to retrieve
+      disabled: true
+    - name: priority
+      value: ""
+      type: query
+      description: The priority of the tasks to retrieve
+      disabled: true
+    - name: limit
+      value: ""
+      type: query
+      description: The maximum number of tasks to retrieve
+      disabled: true
+    - name: offset
+      value: ""
+      type: query
+      description: The offset for pagination
+      disabled: true
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: Successful Response
+    request:
+      url: "{{baseUrl}}/api/v1/tasks/"
+      method: GET
+      params:
+        - name: board_id
+          value: ""
+          type: query
+          description: The ID of the board for which to retrieve tasks
+          disabled: true
+        - name: user_id
+          value: ""
+          type: query
+          description: The ID of the user for which to retrieve tasks
+          disabled: true
+        - name: assigned_to
+          value: ""
+          type: query
+          description: The ID of the assignee for which to retrieve tasks
+          disabled: true
+        - name: status
+          value: ""
+          type: query
+          description: The status of the tasks to retrieve
+          disabled: true
+        - name: priority
+          value: ""
+          type: query
+          description: The priority of the tasks to retrieve
+          disabled: true
+        - name: limit
+          value: ""
+          type: query
+          description: The maximum number of tasks to retrieve
+          disabled: true
+        - name: offset
+          value: ""
+          type: query
+          description: The offset for pagination
+          disabled: true
+    response:
+      status: 200
+      statusText: OK
+      body:
+        type: text
+        data: ""

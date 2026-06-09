@@ -1,0 +1,13 @@
+info:
+  name: user_service
+  type: folder
+  seq: 1
+
+request:
+  headers:
+    - name: Accept
+      value: application/json
+  auth: inherit
+  variables:
+    - name: url
+      value: "{{baseUrl}}/v1/auth"

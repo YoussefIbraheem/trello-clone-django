@@ -1,0 +1,15 @@
+info:
+  name: profile-update
+  type: http
+  seq: 9
+
+http:
+  method: PUT
+  url: "{{url}}/profile/"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

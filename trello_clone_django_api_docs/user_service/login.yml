@@ -1,0 +1,36 @@
+info:
+  name: login
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{url}}/login/"
+  headers:
+    - name: Accept
+      value: application/json
+  body:
+    type: multipart-form
+    data:
+      - name: email
+        type: text
+        value: test11@test.com
+      - name: password
+        type: text
+        value: password@123
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        let accessToken = res.body["tokens"]["access"]
+        let refreshToken = res.body["tokens"]["refresh"]
+        bru.setEnvVar("accessToken", accessToken)
+        bru.setEnvVar("refreshToken", refreshToken)
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

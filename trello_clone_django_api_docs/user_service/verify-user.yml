@@ -1,0 +1,24 @@
+info:
+  name: verify-user
+  type: http
+  seq: 8
+
+http:
+  method: POST
+  url: "{{url}}/verify-user/"
+  body:
+    type: multipart-form
+    data:
+      - name: email
+        type: text
+        value: test9@test.com
+      - name: code
+        type: text
+        value: "589866"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

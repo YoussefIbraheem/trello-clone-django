@@ -1,0 +1,28 @@
+info:
+  name: list-users
+  type: http
+  seq: 6
+
+http:
+  method: GET
+  url: "{{url}}/users/"
+  body:
+    type: multipart-form
+    data:
+      - name: email
+        type: text
+        value: ""
+      - name: username
+        type: text
+        value: ""
+      - name: is_verified
+        type: file
+        value:
+          - ""
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

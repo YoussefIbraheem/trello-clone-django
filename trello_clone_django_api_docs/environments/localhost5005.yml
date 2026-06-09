@@ -1,0 +1,4 @@
+name: localhost5005
+variables:
+  - name: baseUrl
+    value: http://localhost:5005/api
