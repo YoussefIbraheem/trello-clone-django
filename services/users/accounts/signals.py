@@ -20,7 +20,7 @@ def on_user_save(sender, instance, created, **kwargs):
             user_id=str(instance.id), email=instance.email, username=instance.username
         )
 
-    publish_history_event.delay(event.to_dict())
+        publish_history_event.delay(event.to_dict())
 
 
 @receiver(post_save, sender=UserProfile)
