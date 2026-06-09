@@ -1,9 +1,13 @@
 from typing import List, Optional
-from app.models.project import Project
-from app.schemas.project_schema import ProjectCreate, ProjectUpdate, ProjectResponse
-from app.db.database import get_db_session
+
 from utils.publisher import publish_history_event
+
 from app import logger
+from app.db.database import get_db_session
+from app.events.project_event import ProjectCreatedEvent
+from app.models.project import Project
+from app.schemas.project_schema import ProjectCreate, ProjectResponse, ProjectUpdate
+
 
 def get_projects_by_owner(
     owner_id: str, limit: int = 50, offset: int = 0
@@ -25,8 +29,6 @@ def get_projects_by_owner(
             .limit(limit)
             .all()
         )
-        
-        logger.info("Fetched projects from DB")
 
         return [ProjectResponse.model_validate(project) for project in db_projects]
 
@@ -62,8 +64,14 @@ def create_project(project_data: ProjectCreate) -> ProjectResponse:
         db.add(db_project)
         db.flush()
         db.refresh(db_project)
-        print(f" db_project = {db_project.to_dict()}")
-        publish_history_event(db_project.to_dict())
+
+        event = ProjectCreatedEvent(
+            project_name=db_project.name,
+            description=db_project.description,
+            owner_id=db_project.owner_id,
+        )
+
+        publish_history_event(event.to_dict())
 
         return ProjectResponse.model_validate(db_project)
 
@@ -110,5 +118,5 @@ def delete_project(project_id: int) -> bool:
             db.delete(db_project)
             db.flush()
             return True
-        
+
         raise ValueError(f"Project with id {project_id} does not exist")
