@@ -12,13 +12,16 @@ http:
       - name: email
         type: text
         value: ""
+        disabled: true
       - name: username
         type: text
         value: ""
+        disabled: true
       - name: is_verified
         type: file
         value:
           - ""
+        disabled: true
   auth: inherit
 
 settings:

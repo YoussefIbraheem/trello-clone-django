@@ -7,7 +7,7 @@ info:
 
 http:
   method: DELETE
-  url: "{{baseUrl}}/api/v1/boards/:board_id"
+  url: "{{url}}/boards/:board_id"
   params:
     - name: board_id
       value: ""

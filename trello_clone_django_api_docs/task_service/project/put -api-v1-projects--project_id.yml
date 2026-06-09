@@ -7,7 +7,7 @@ info:
 
 http:
   method: PUT
-  url: "{{baseUrl}}/api/v1/projects/:project_id"
+  url: "{{url}}/projects/:project_id"
   params:
     - name: project_id
       value: ""

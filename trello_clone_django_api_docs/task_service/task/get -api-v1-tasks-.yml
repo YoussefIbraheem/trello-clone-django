@@ -7,7 +7,7 @@ info:
 
 http:
   method: GET
-  url: "{{baseUrl}}/api/v1/tasks/"
+  url: "{{url}}/tasks/"
   params:
     - name: board_id
       value: ""

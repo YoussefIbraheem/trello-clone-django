@@ -7,7 +7,23 @@ request:
   headers:
     - name: Accept
       value: application/json
-  auth: inherit
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
   variables:
     - name: url
-      value: "{{baseUrl}}/v1/auth"
+      value: "{{baseUrl}}8000/api/v1/auth"
+    - name: refreshToken
+      value: ""
+    - name: accessToken
+      value: ""
+  actions:
+    - type: set-variable
+      phase: after-response
+      selector:
+        expression: ""
+        method: jsonq
+      variable:
+        name: ""
+        scope: runtime
+      disabled: true
