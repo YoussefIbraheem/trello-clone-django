@@ -12,6 +12,12 @@ class Settings:
     Singleton pattern is used to ensure only one instance of settings is created.
     """
 
+    # SYSTEM settings
+    ENVIRONMENT: str = "development"
+    LOGGING_LOCATION: str = "/var/log"
+    LOGGING_LEVEL: str = "INFO"
+    TIMEZONE: str = "UTC"
+
     # API settings
     API_V1_PREFIX: str = "/api/v1"
     SERVICE_NAME: str = "tasks"
@@ -26,7 +32,7 @@ class Settings:
     DB_URL: str = "postgresql://postgres:password@localhost:5432/trello_tasks_db"
 
     # Broker URL
-    BROKER_URL = "amqp://guest:guest@rabbitmq:5672//"
+    BROKER_URL = "amqp://guest:guest@rabbitmq:5672/"
 
     _instance: Optional[Settings] = None
 
@@ -38,6 +44,8 @@ class Settings:
         self.HOST = os.getenv("HOST", self.HOST)
         self.PORT = os.getenv("PORT", self.PORT)
         self.DEBUG = os.getenv("DEBUG", str(self.DEBUG)).lower() == "true"
+        self.LOGGING_LOCATION = os.getenv("LOGGING_LOCATION", self.LOGGING_LOCATION)
+        self.LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", self.LOGGING_LEVEL)
         self.DB_URL = os.getenv("DB_URL", self.DB_URL)
         self.BROKER_URL = os.getenv("BROKER_URL",self.BROKER_URL)
 
