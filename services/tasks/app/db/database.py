@@ -1,10 +1,9 @@
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, event
 from sqlalchemy.orm import Session, sessionmaker
 from contextlib import contextmanager
 from app import settings
 from app.models import Base
 from typing import Iterator
-
 
 engine = create_engine(settings.DB_URL, pool_pre_ping=True, echo=True)
 
