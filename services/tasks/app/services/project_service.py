@@ -65,14 +65,6 @@ def create_project(project_data: ProjectCreate) -> ProjectResponse:
         db.flush()
         db.refresh(db_project)
 
-        event = ProjectCreatedEvent(
-            project_name=db_project.name,
-            description=db_project.description,
-            owner_id=db_project.owner_id,
-        )
-
-        publish_history_event(event.to_dict())
-
         return ProjectResponse.model_validate(db_project)
 
 

@@ -1,13 +1,12 @@
 import json
 import uuid
-import pika
 
-from app import settings, logger
+import pika
+from app import logger, settings
+
 
 def publish_history_event(event_data: dict):
 
-    logger.info(f"Publishing history event: {event_data}")
-    
     try:
         with pika.BlockingConnection(
             pika.URLParameters(settings.BROKER_URL)
@@ -30,6 +29,8 @@ def publish_history_event(event_data: dict):
                     delivery_mode=2,
                 ),
             )
-            logger.info(f"History event published: {event_data}")
+            logger.info(
+                f"History event for action {event_data['action']} model {event_data['service']} published successfully."
+            )
     except Exception as e:
-            logger.error(f"Failed to publish history event:{e}", exc_info=True)
+        logger.error(f"Failed to publish history event:{e}", exc_info=True)
