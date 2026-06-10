@@ -6,7 +6,7 @@ from app import logger, settings
 
 
 def publish_history_event(event_data: dict):
-
+    """Publish a new history event."""
     try:
         with pika.BlockingConnection(
             pika.URLParameters(settings.BROKER_URL)

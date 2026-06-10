@@ -30,9 +30,11 @@ class Project(Base):
     )
 
 
+# ORM EVENTS
+
 @event.listens_for(Project, "after_insert")
 def project_created(mapper, connection, target):
-
+    """Publish a project created event to the message broker."""
     event = ProjectCreatedEvent(
         project_name=target.name,
         owner_id=target.owner_id,
@@ -44,6 +46,9 @@ def project_created(mapper, connection, target):
 
 @event.listens_for(Project, "after_update")
 def project_updated(mapper, connection, target):
+    """Publish a project updated event to the message broker."""
+    # Get all attributes that have been changed and publish them as events
+    
     inspected_attrs = inspect(target).attrs
     updated_fields = []
 
@@ -70,6 +75,8 @@ def project_updated(mapper, connection, target):
 
 @event.listens_for(Project, "after_delete")
 def project_deleted(mapper, connection, target):
+    """Publish a project deleted event to the message broker."""
+    
     event = ProjectDeletedEvent(project_name=target.name, owner_id=target.owner_id)
 
     publish_history_event(event.to_dict())
