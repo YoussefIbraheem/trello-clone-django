@@ -32,8 +32,6 @@ class Board(Base):
 @event.listens_for(Board, "after_insert")
 def board_created(mapped, connection, target):
 
-    event = BoardCreatedEvent(
-        target.project_id, description=target.description, columns=target.columns
-    )
+    event = BoardCreatedEvent(name= target.name, description = target.description, project_id=target.project_id)
 
     publish_history_event(event.to_dict())

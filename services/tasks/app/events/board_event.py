@@ -7,12 +7,14 @@ class BoardCreatedEvent(BaseEvent):
     def __init__(
         self,
         project_id: str,
+        name:str,
         description: Optional[str] = None,
         columns: Optional[list] = [],
     ):
         self.details = {
-            "project_id": project_id,
+            "name":name,
             "description": description,
+            "project_id": project_id,
             "columns": columns,
         }
         super().__init__(details=self.details)
