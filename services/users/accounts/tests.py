@@ -1,10 +1,12 @@
+from logging import getLogger
+
 from django.test import TestCase
 from django.urls import reverse
-from rest_framework.test import APIClient
 from rest_framework import status
+from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
+
 from .models import User, UserProfile
-from logging import getLogger
 
 logger = getLogger(__name__)
 
@@ -180,7 +182,10 @@ class UserLoginTestCase(TestCase):
         response = self.client.post(self.login_url, data)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("Account not verified. A new verification code has been sent to your email.", response.data["non_field_errors"][0])
+        self.assertIn(
+            "Account not verified. A new verification code has been sent to your email.",
+            response.data["non_field_errors"][0],
+        )
 
     def test_user_login_inactive_user(self):
         """Test login with inactive user"""
