@@ -38,6 +38,7 @@ async def create_event(event_data: dict):
 
     event_create = EventCreate(**event_data)
     event = Event(
+        actor_id= event_create.actor_id,
         service=event_create.service,
         action=event_create.action,
         subject_id=event_create.subject_id,

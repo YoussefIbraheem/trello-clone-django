@@ -32,6 +32,9 @@ class UserAdmin(BaseUserAdmin):
         ("General Data", {"fields": ["date_joined"]}),
         ("Danger Zone", {"classes": ["collapsable"], "fields": ["password"]}),
     ]
+    def save_model(self, request, obj, form, change):
+        obj._actor_id = request.user.id
+        return super().save_model(request, obj, form, change)
 
 
 class UserProfileAdmin(admin.ModelAdmin):

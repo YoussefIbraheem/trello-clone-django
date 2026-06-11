@@ -5,15 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, permissions, response, status, views
 from rest_framework_simplejwt import tokens
-
-from .events import (
-    UserLoginEvent,
-    UserLogoutEvent,
-    UserRegisteredEvent,
-    UserUpdateEvent,
-)
 from .models import User, UserProfile
-from .publisher import publish_history_event
 from .serializers import (
     UserLoginSerializer,
     UserLogoutSerializer,
@@ -25,11 +17,22 @@ from .serializers import (
 
 logger = logging.getLogger(__name__)
 
+class ActorMixin:
+    def get_actor_id(self):
+        request = getattr(self, "request", None)
+
+        if request and getattr(request, "user", None):
+            user = request.user
+            if user.is_authenticated:
+                return user.id
+
+        return None
+
 
 # Create your views here.
 
 
-class UserRegisterationView(views.APIView):
+class UserRegisterationView(ActorMixin,views.APIView):
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
 
@@ -39,7 +42,8 @@ class UserRegisterationView(views.APIView):
         if serializer.is_valid():
             user = serializer.save()
 
-            print(f"USERID TYPE: {type(user.id)}")
+            actor_id = self.get_actor_id() or user.id
+            user._actor_id = actor_id
 
             refresh = tokens.RefreshToken.for_user(user=user)
 
@@ -57,7 +61,7 @@ class UserRegisterationView(views.APIView):
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserLoginView(views.APIView):
+class UserLoginView(ActorMixin,views.APIView):
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
 
@@ -67,11 +71,10 @@ class UserLoginView(views.APIView):
         if serializer.is_valid():
             user = serializer.validated_data
 
+            actor_id = self.get_actor_id() or user.id
+            user._actor_id = actor_id
+
             refresh = tokens.RefreshToken.for_user(user=user)
-
-            event = UserLoginEvent(user_id=str(user.id), email=user.email)
-
-            publish_history_event.delay(event.to_dict())
 
             logger.warning(
                 f"REFRESH TOKEN FOR USER {user.username}: {str(refresh)}", exc_info=True
@@ -94,7 +97,7 @@ class UserLoginView(views.APIView):
             )
 
 
-class UserProfileView(views.APIView):
+class UserProfileView(ActorMixin,views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(responses={200: UserProfileSerializer()})
@@ -121,11 +124,14 @@ class UserProfileView(views.APIView):
         if serializer.is_valid():
             serializer.save()
 
+            actor_id = self.get_actor_id() or request.user.id
+            request.user._actor_id = actor_id
+
             return response.Response(serializer.data)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserChangePasswordView(views.APIView):
+class UserChangePasswordView(ActorMixin,views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(
@@ -139,15 +145,10 @@ class UserChangePasswordView(views.APIView):
             data=request.data, context={"request": request}
         )
         if serializer.is_valid():
-            serializer.save()
+            user = serializer.save()
 
-            event = UserUpdateEvent(
-                user_id=str(request.user.id),
-                email=request.user.email,
-                updated_fields=["password"],
-            )
-
-            publish_history_event.delay(event.to_dict())
+            actor_id = self.get_actor_id() or user.id
+            user._actor_id = actor_id
 
             return response.Response(
                 {"message": "Password Updated Successfully!"},
@@ -156,7 +157,7 @@ class UserChangePasswordView(views.APIView):
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserLogoutView(views.APIView):
+class UserLogoutView(ActorMixin,views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(
@@ -168,11 +169,10 @@ class UserLogoutView(views.APIView):
             data=request.data, context={"request": request}
         )
         if serializer.is_valid():
-            serializer.save()
-            event = UserLogoutEvent(
-                user_id=str(request.user.id), email=request.user.email
-            )
-            publish_history_event.delay(event.to_dict())
+            user = serializer.save()
+
+        # Actor assigning is not needed here
+ 
             return response.Response(
                 {"message": "User logged out successfully."},
                 status=status.HTTP_200_OK,
@@ -202,7 +202,7 @@ class UserDetailsView(generics.RetrieveAPIView):
         return super().get(request, *args, **kwargs)
 
 
-class UserVerificationEmailView(views.APIView):
+class UserVerificationEmailView(ActorMixin,views.APIView):
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
 
@@ -225,6 +225,9 @@ class UserVerificationEmailView(views.APIView):
                 )
                 user.is_verified = True
                 user.save()
+
+                actor_id = self.get_actor_id() or user.id
+                user._actor_id = actor_id
 
                 verification.delete()
 

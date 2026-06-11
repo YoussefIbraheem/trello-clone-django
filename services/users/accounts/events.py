@@ -1,24 +1,25 @@
 import re
-
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
-from dataclasses import dataclass, asdict, field
 from typing import Optional
+
 
 @dataclass
 class BaseEvent:
-    user_id: str
+    actor_id: str
+    subject_id: str
+    subject_type: str = "users"
     service: str = "users"
-    actor_id: Optional[str] = None
     action: str = field(init=False)
     timestamp: str = field(init=False)
-    details: Optional[dict] = None
+    metadata: Optional[dict] = None
 
     def __post_init__(self):
         name = self.__class__.__name__.replace("Event", "")
-        self.action = re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()
+        self.action = re.sub(r"(?<!^)(?=[A-Z])", "_", name).upper()
         self.timestamp = datetime.now(timezone.utc).isoformat()
-        if self.details is None:
-            self.details = {}
+        if self.metadata is None:
+            self.metadata = {}
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -26,40 +27,43 @@ class BaseEvent:
 
 @dataclass
 class UserRegisteredEvent(BaseEvent):
-    def __init__(self, user_id: str, email: str, username: str, actor_id: Optional[str] = None):
-        self.details = {"email": email, "username": username}
-        super().__init__(user_id=user_id, actor_id=actor_id, details=self.details)
+    def __init__(self, subject_id: str, email: str, username: str, actor_id: str):
+        self.metadata = {"email": email, "username": username}
+
+        super().__init__(
+            subject_id=subject_id, actor_id=actor_id, metadata=self.metadata
+        )
 
 
 @dataclass
 class UserLoginEvent(BaseEvent):
-    def __init__(self, user_id: str, email: str):
+    def __init__(self, subject_id: str, email: str, actor_id: str):
         super().__init__(
-            user_id=user_id,
-            details={"email": email}
+            subject_id=subject_id, actor_id=actor_id, metadata={"email": email}
         )
+
 
 class UserLogoutEvent(BaseEvent):
-    def __init__(self, user_id: str, email: str):
+    def __init__(self, subject_id: str, actor_id: str, email: str):
         super().__init__(
-            user_id=user_id,
-            details={"email": email}
+            subject_id=subject_id, actor_id=actor_id, metadata={"email": email}
         )
 
+
 class UserUpdateEvent(BaseEvent):
-    def __init__(self, user_id: str, email: str, updated_fields: Optional[list], actor_id: Optional[str] = None):
+    def __init__(
+        self, subject_id: str, actor_id: str, email: str, updated_fields: Optional[list]
+    ):
         super().__init__(
-            user_id=user_id,
+            subject_id=subject_id,
             actor_id=actor_id,
-            details={"email": email, "updated_fields": updated_fields}
+            metadata={"email": email, "updated_fields": updated_fields},
         )
-        
+
+
 @dataclass
 class UserDeleteEvent(BaseEvent):
-    def __init__(self, user_id: str, email: str,actor_id: Optional[str] = None):
+    def __init__(self, subject_id: str, email: str, actor_id: str):
         super().__init__(
-            user_id=user_id,
-            actor_id=actor_id,
-            details={"email": email}
-            
+            subject_id=subject_id, actor_id=actor_id, metadata={"email": email}
         )

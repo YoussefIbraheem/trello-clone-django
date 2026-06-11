@@ -10,14 +10,26 @@ from .publisher import publish_history_event
 logger = getLogger(__name__)
 
 
+def _get_actor_id(instance): 
+    actor_id = getattr(instance, "_actor_id", None) 
+    if actor_id: 
+        return actor_id
+
+    return str(instance.id)
+
+
 @receiver(post_save, sender=User)
 def on_user_save(sender, instance, created, **kwargs):
     logger.info("USER SAVE TRIGGERED!!")
     if created:
         # Dispatch the event to the history service
-        logger.info("User registered: %s", instance.username)
+        logger.info("User registered: %s", instance)
+
         event = UserRegisteredEvent(
-            user_id=str(instance.id), email=instance.email, username=instance.username
+            subject_id=str(instance.id),
+            actor_id=_get_actor_id(instance),
+            email=instance.email,
+            username=instance.username,
         )
 
         publish_history_event.delay(event.to_dict())
@@ -27,8 +39,9 @@ def on_user_save(sender, instance, created, **kwargs):
 def on_user_profile_saved(sender, instance, created, **kwargs):
     if not created:
         event = UserUpdateEvent(
-            user_id=str(instance.user.id),
+            subject_id=str(instance.user.id),
+            actor_id=_get_actor_id(instance),
             email=instance.user.email,
-            updated_fields= list(instance.get_dirty_fields().keys()),
+            updated_fields=list(instance.get_dirty_fields().keys()),
         )
         publish_history_event.delay(event.to_dict())

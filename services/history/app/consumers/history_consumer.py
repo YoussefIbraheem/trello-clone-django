@@ -45,6 +45,7 @@ celery_app.conf.update(
 )
 def record_activity(self, event_data: dict):
     try:
+        logger.info(f"Passed record:{event_data}")
         event_id = self.run_async(create_event(event_data))
         logger.info(f"Activity recorded successfully with ID: {event_id}")
     except Exception as e:
