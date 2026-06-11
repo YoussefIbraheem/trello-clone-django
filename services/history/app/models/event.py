@@ -1,15 +1,21 @@
 from beanie import Document
 from typing import Dict, Any
 from datetime import datetime , timezone
-from typing import Optional
+from pydantic import Field
+
+def utc_now():
+    return datetime.now(timezone.utc)
+
 class Event(Document):
     
+    actor_id: str
     service: str
     action: str
-    user_id: str
-    actor_id: Optional[str] = None
-    details: Dict[str, Any]
-    timestamp: datetime = datetime.now(timezone.utc)
+    subject_id: str
+    subject_type: str
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+
+    timestamp: datetime = Field(default_factory=utc_now)
     
     class Settings:
         name =  "events"
