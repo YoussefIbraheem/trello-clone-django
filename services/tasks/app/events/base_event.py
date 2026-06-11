@@ -1,12 +1,12 @@
 import re
-
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
-from dataclasses import dataclass, asdict, field
 from typing import Optional
+
 
 @dataclass
 class BaseEvent:
-    user_id: str
+    user_id:str = "tmp"
     service: str = "tasks"
     actor_id: Optional[str] = None
     action: str = field(init=False)
