@@ -26,7 +26,7 @@ class BaseEvent:
 
 
 @dataclass
-class UserRegisteredEvent(BaseEvent):
+class UserRegisterEvent(BaseEvent):
     def __init__(self, subject_id: str, email: str, username: str, actor_id: str):
         self.metadata = {"email": email, "username": username}
 
@@ -37,27 +37,72 @@ class UserRegisteredEvent(BaseEvent):
 
 @dataclass
 class UserLoginEvent(BaseEvent):
-    def __init__(self, subject_id: str, email: str, actor_id: str):
+    def __init__(self, subject_id: str, email: str, actor_id: str, username: str):
         super().__init__(
-            subject_id=subject_id, actor_id=actor_id, metadata={"email": email}
+            subject_id=subject_id,
+            actor_id=actor_id,
+            metadata={"email": email, "username": username},
         )
 
 
+@dataclass
 class UserLogoutEvent(BaseEvent):
-    def __init__(self, subject_id: str, actor_id: str, email: str):
+    def __init__(self, subject_id: str, actor_id: str, email: str, username: str):
         super().__init__(
-            subject_id=subject_id, actor_id=actor_id, metadata={"email": email}
+            subject_id=subject_id,
+            actor_id=actor_id,
+            metadata={"email": email, "username": username},
         )
 
 
-class UserUpdateEvent(BaseEvent):
+@dataclass
+class UserProfileUpdateEvent(BaseEvent):
     def __init__(
-        self, subject_id: str, actor_id: str, email: str, updated_fields: Optional[list]
+        self,
+        subject_id: str,
+        actor_id: str,
+        email: str,
+        username:str,
+        updated_fields: Optional[list] = [],
+    ):
+        super().__init__(
+            subject_id=subject_id,
+            subject_type="user_profile",
+            actor_id=actor_id,
+            metadata={"email": email, "username":username ,"updated_fields": updated_fields},
+        )
+
+
+@dataclass
+class UserPasswordChangeEvent(BaseEvent):
+    def __init__(
+        self,
+        subject_id: str,
+        actor_id: str,
+        change_source: Optional[str],
+        auth_method: Optional[str],
+        ip_address: Optional[str],
+        user_agent: Optional[str],
+        sessions_invalidated: bool = True,
     ):
         super().__init__(
             subject_id=subject_id,
             actor_id=actor_id,
-            metadata={"email": email, "updated_fields": updated_fields},
+            metadata={
+                "change_source": change_source,
+                "auth_method": auth_method,
+                "ip_address": ip_address,
+                "user_agent": user_agent,
+                "sessions_invalidated": sessions_invalidated,
+            },
+        )
+
+
+@dataclass
+class UserEmailChangeEvent(BaseEvent):
+    def __init__(self, subject_id: str, new_email: str, actor_id: str):
+        super().__init__(
+            subject_id=subject_id, actor_id=actor_id, metadata={"new_email": new_email}
         )
 
 
