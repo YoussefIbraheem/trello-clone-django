@@ -5,7 +5,6 @@ from app.schemas.task_schema import TaskCreate, TaskUpdate, TaskResponse
 from app.db.database import get_db_session
 from sqlalchemy import func
 
-
 def get_tasks(
     board_id: int,
     user_id: Optional[str] = None,

@@ -1,4 +1,5 @@
 from __future__ import annotations  # For forward references in type hints
+
 import os
 from dataclasses import dataclass
 from typing import Optional
@@ -22,6 +23,8 @@ class Settings:
     API_V1_PREFIX: str = "/api/v1"
     SERVICE_NAME: str = "tasks"
     SERVICE_VERSION: str = "0.1.0"
+    JWT_SECRET_KEY: str = ""
+    JWT_DECODE_ALGORITHMS:str = "HS256"
 
     # Server settings
     HOST: str = "0.0.0.0"
@@ -41,13 +44,15 @@ class Settings:
         self.API_V1_PREFIX = os.getenv("API_V1_PREFIX", self.API_V1_PREFIX)
         self.SERVICE_NAME = os.getenv("SERVICE_NAME", self.SERVICE_NAME)
         self.SERVICE_VERSION = os.getenv("SERVICE_VERSION", self.SERVICE_VERSION)
+        self.JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", self.JWT_SECRET_KEY)
+        self.JWT_DECODE_ALGORITHMS = os.getenv("JWT_DECODE_ALGORITHMS", self.JWT_DECODE_ALGORITHMS)
         self.HOST = os.getenv("HOST", self.HOST)
         self.PORT = os.getenv("PORT", self.PORT)
         self.DEBUG = os.getenv("DEBUG", str(self.DEBUG)).lower() == "true"
         self.LOGGING_LOCATION = os.getenv("LOGGING_LOCATION", self.LOGGING_LOCATION)
         self.LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", self.LOGGING_LEVEL)
         self.DB_URL = os.getenv("DB_URL", self.DB_URL)
-        self.BROKER_URL = os.getenv("BROKER_URL",self.BROKER_URL)
+        self.BROKER_URL = os.getenv("BROKER_URL", self.BROKER_URL)
 
     @classmethod
     def get_instance(cls) -> Settings:

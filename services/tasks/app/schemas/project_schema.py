@@ -1,7 +1,7 @@
-from pydantic import BaseModel, ConfigDict, Field
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ProjectBase(BaseModel):
@@ -10,14 +10,15 @@ class ProjectBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=255, description="Project Name")
     description: Optional[str] = Field(None, description="Project Description")
     owner_id: int = Field(..., description="Owner ID")
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 
 class ProjectCreate(ProjectBase):
     """Model for creating a new project."""
+    owner_id: int = Field(...,exclude=True)
 
-    pass
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ProjectUpdate(BaseModel):
@@ -30,9 +31,8 @@ class ProjectUpdate(BaseModel):
         None, min_length=1, max_length=255, description="Project Name"
     )
     description: Optional[str] = Field(None, description="Project Description")
-    
-    model_config = ConfigDict(from_attributes=True)
 
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ProjectResponse(ProjectBase):
@@ -43,4 +43,3 @@ class ProjectResponse(ProjectBase):
     updated_at: Optional[datetime] = Field(
         ..., description="Project Updating Date and Time"
     )
-
