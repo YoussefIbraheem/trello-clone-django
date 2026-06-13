@@ -10,13 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
-from pathlib import Path
-import environ
 import os
 from datetime import timedelta
+from pathlib import Path
+
+import environ
 
 env = environ.Env(DEBUG=(bool, False))
-
 
 # Load environment variables from .env file
 
@@ -151,7 +151,7 @@ LOGGING = {
         "file": {
             "level": "WARNING",
             "class": "logging.FileHandler",
-            "filename": f"{os.path.join(BASE_DIR,'general.log')}",
+            "filename": f"{os.path.join(BASE_DIR, 'general.log')}",
             "formatter": "verbose",
         },
     },
@@ -200,6 +200,8 @@ SIMPLE_JWT = {
         days=env.int("REFRESH_TOKEN_LIFETIME", default=1)
     ),
     "AUTH_HEADER_TYPES": ["Bearer"],
+    "ALGORITHM": env("ALGORITHM"),
+    "SIGNING_KEY": env("JWT_SECRET_KEY"),
 }
 
 # Celery Broker Configuration

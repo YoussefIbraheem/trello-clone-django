@@ -5,7 +5,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, permissions, response, status, views
 from rest_framework_simplejwt import tokens
-
 from .events import (
     UserDeleteEvent,
     UserEmailChangeEvent,
@@ -88,7 +87,8 @@ class UserLoginView(views.APIView):
             publish_history_event(event.to_dict())
 
             refresh = tokens.RefreshToken.for_user(user=user)
-
+            refresh["sub"] = str(user.id) # required by flask-jwt-extended
+            
             logger.warning(
                 f"REFRESH TOKEN FOR USER {user.username}: {str(refresh)}", exc_info=True
             )
@@ -100,7 +100,7 @@ class UserLoginView(views.APIView):
                     "tokens": {
                         "refresh": str(refresh),
                         "access": str(refresh.access_token),
-                    },
+                    }
                 },
                 status=status.HTTP_201_CREATED,
             )
