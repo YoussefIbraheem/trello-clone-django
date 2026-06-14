@@ -1,45 +1,4 @@
-# project_test.py
-import os
-
-os.environ["DB_URL"] = "sqlite:///:memory:"
-
-import pytest
-from flask_jwt_extended import JWTManager, create_access_token
-from app import create_app
-from . import DummyModel
-
-# ── Fixtures ──────────────────────────────────────────────────────────────────
-
-@pytest.fixture
-def app():
-    os.environ["DB_URL"] = "sqlite:///:memory:"
-    from app.db.database import create_tables
-
-    flask_app = create_app()
-    flask_app.config["TESTING"] = True
-    flask_app.config["JWT_SECRET_KEY"] = "test-secret-key"
-    flask_app.config["JWT_ALGORITHM"] = "HS256"
-
-    JWTManager(flask_app)
-    create_tables()
-
-    yield flask_app
-
-
-@pytest.fixture
-def client(app):
-    return app.test_client()
-
-
-@pytest.fixture
-def auth_headers(app):
-    """Generate a valid JWT token and return it as Authorization headers."""
-    with app.app_context():
-        token = create_access_token(identity="10")  # default identity; override per test if needed
-        return {"Authorization": f"Bearer {token}"}
-
-
-# ── Tests ─────────────────────────────────────────────────────────────────────
+from . import DummyModel, create_access_token, client, app, auth_headers
 
 def test_projects_list_returns_projects(client, app, monkeypatch):
     expected = [
